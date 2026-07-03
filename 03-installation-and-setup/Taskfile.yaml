@@ -1,0 +1,208 @@
+version: "3"
+
+env:
+  CLUSTER_NAME: klaus-learning
+  GCP_REGION: europe-central2
+  GCP_ZONE: europe-central2-a
+  # Set default gum style options
+  BORDER: double
+  BORDER_FOREGROUND: "212"
+  PADDING: "1 1"
+  MARGIN: "1 1"
+
+  SUB_ID_AZURE: 65b5b7d2-d95d-4de3-ba61-b7b49d12519b
+  RESOURCE_GROUP: azure-devops-learning
+  LOCATION: polandcentral
+
+tasks:
+  azure:01-init-azure-cli:
+    cmds:
+      - az login
+      - az account set --subscription "${SUB_ID_AZURE}"
+    desc: "Authenticate to Azure CLI"
+
+  azure:02-giving-permissions-to-create:
+    cmds:
+      - az provider register --namespace Microsoft.ContainerService
+      - az provider register --namespace Microsoft.Network
+      - az provider register --namespace Microsoft.Compute
+    desc: 'We are switching on some permissions to create network resources like subnets, VNets, or cluster related resources'
+ 
+  azure:03-create-resource-group:
+    cmds:
+      - |
+        az group create \
+          --name ${RESOURCE_GROUP} \
+          --location ${LOCATION}
+    desc: "Create resource group where you will deploy any resource/service"
+
+  azure:04-configure-defaults-location:
+    cmds: 
+      - |
+        az configure --defaults \
+          location=${LOCATION} \
+          group=${RESOURCE_GROUP}
+    desc: "Assign a default location for the Resource Group created before"
+
+  azure:05-create-VNET:
+    cmds:
+      - |
+        az network vnet create \
+          --resource-group $RESOURCE_GROUP \
+          --name $CLUSTER_NAME \
+          --location $LOCATION \
+          --address-prefix 10.0.0.0/16
+    desc: "Create VNET - VPC Equivalent"
+
+  azure:06-create-subnet:
+    cmds:
+      - |
+        az network vnet subnet create \
+          --resource-group $RESOURCE_GROUP \
+          --vnet-name $CLUSTER_NAME \
+          --name subnet-1 \
+          --address-prefixes 10.0.0.0/20
+    desc: "Create subnet in the VNet created"
+
+  azure:07-create-cluster:
+    cmds:
+      - |
+        SUBNET_ID=$(az network vnet subnet show \
+          --resource-group $RESOURCE_GROUP \
+          --vnet-name $CLUSTER_NAME \
+          --name subnet-1 \
+          --query id -o tsv)
+
+        az aks create \
+          --resource-group $RESOURCE_GROUP \
+          --name $CLUSTER_NAME \
+          --location $LOCATION \
+          --network-plugin azure \
+          --vnet-subnet-id $SUBNET_ID \
+          --service-cidr 10.1.0.0/16 \
+          --dns-service-ip 10.1.0.10 \
+          --node-vm-size Standard_D2s_v3 \
+          --node-osdisk-type Managed \
+          --node-osdisk-size 50 \
+          --node-count 2 \
+          --enable-gateway-api \
+          --enable-workload-identity \
+          --enable-oidc-issuer \
+          --generate-ssh-keys
+    desc: "Create cluster on a specific subnet"
+
+  azure:08-connect-to-cluster:
+    cmds: 
+      - |
+        az aks get-credentials \
+          --resource-group $RESOURCE_GROUP \
+          --name $CLUSTER_NAME
+    desc: "Connect to cluster, which updates the kube config and you see the context as well"
+
+  azure:09-clean-up:
+    cmds:
+      - az group delete --name ${RESOURCE_GROUP} --yes --no-wait
+    desc: "Delete the resource group that deletes everything"
+
+  azure:10-query-for-nodepools:
+    cmds:
+      - az aks nodepool list --resource-group ${RESOURCE_GROUP} --cluster-name ${CLUSTER_NAME} -o table
+    desc: "Showcase the nodepool list and check for MODE column for System/User Type"
+
+
+
+  gcp:01-init-cli:
+    cmds:
+      - gcloud init
+    desc: "Authenticate and configure the gcloud CLI"
+
+  gcp:02-enable-apis:
+    cmds:
+      - |
+        gcloud services enable \
+          compute.googleapis.com \
+          container.googleapis.com \
+          cloudresourcemanager.googleapis.com \
+          iam.googleapis.com \
+          secretmanager.googleapis.com \
+          servicemanagement.googleapis.com \
+          serviceusage.googleapis.com
+    desc: "Enable necessary APIs"
+
+  gcp:03-set-region-and-zone:
+    cmds:
+      - gcloud config set compute/region ${GCP_REGION}
+      - gcloud config set compute/zone ${GCP_ZONE}
+    desc: "Set default region and zone"
+
+  gcp:04-create-vpc:
+    cmds:
+      - gcloud compute networks create ${CLUSTER_NAME} --subnet-mode=custom
+    desc: "Create VPC"
+
+  gcp:05-create-subnet:
+    cmds:
+      - |
+        gcloud compute networks subnets create subnet-1 \
+          --network=${CLUSTER_NAME} \
+          --region=${GCP_REGION} \
+          --range=10.0.0.0/20
+    desc: "Create subnet"
+
+  gcp:06-create-cluster:
+    desc: "Create GKE cluster"
+    vars:
+      GCP_PROJECT_ID: k8s-learning-gke
+    cmds:
+      - |
+        gcloud container clusters create ${CLUSTER_NAME} \
+          --zone ${GCP_ZONE} \
+          --network ${CLUSTER_NAME} \
+          --subnetwork subnet-1 \
+          --machine-type e2-standard-2 \
+          --disk-type=pd-balanced \
+          --disk-size=50 \
+          --num-nodes 2 \
+          --gateway-api=standard \
+          --workload-pool={{.GCP_PROJECT_ID}}.svc.id.goog
+
+  gcp:07-create-all:
+    cmds:
+      - task: gcp:02-enable-apis
+      - task: gcp:03-set-region-and-zone
+      - task: gcp:04-create-vpc
+      - task: gcp:05-create-subnet
+      - task: gcp:06-create-cluster
+    desc: Create the GCP network, subnet, firewall rules, and cluster in sequence
+
+  gcp:09-clean-up:
+    cmds:
+      - gcloud container clusters delete ${CLUSTER_NAME} --zone ${GCP_ZONE} --quiet
+      - gcloud compute networks subnets delete subnet-1 --region=${GCP_REGION} --quiet
+      - gcloud compute networks delete ${CLUSTER_NAME} --quiet
+    desc: Delete the GCP network, subnet, firewall rules, and cluster in reverse sequence
+
+  gcp:08-connect-to-cluster:
+    cmds:
+      - gcloud container clusters get-credentials ${CLUSTER_NAME} --zone ${GCP_ZONE}
+    desc: "Connect to the GKE cluster"
+
+  kind:01-generate-config:
+    cmds:
+      - REPLACE_WITH_ABSOLUTE_PATH=${PWD} envsubst < kind-config.yaml.TEMPLATE > kind-config.yaml
+    desc: "Generate kind config with local absolute paths for PV mounts"
+
+  kind:02-create-cluster:
+    cmds:
+      - kind create cluster --config kind-config.yaml
+    desc: Create a Kubernetes cluster using kind
+
+  kind:03-run-cloud-provider-kind:
+    desc: "Run sigs.k8s.io/cloud-provider-kind@latest to enable load balancer services with KinD"
+    cmds:
+      - sudo cloud-provider-kind
+
+  kind:04-delete-cluster:
+    cmds:
+      - kind delete cluster
+    desc: Delete and existing a kind Kubernetes cluster

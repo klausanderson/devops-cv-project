@@ -1,0 +1,12 @@
+vars:
+  - file: config/{{ args.environment }}.yaml
+
+deployments:
+  - path: namespaces # first deploy the namespaces
+  - barrier: true # wait for namespaces to be created and healthy
+  - include: third-party # then deploy the third-party components - CNPG and Traefik
+  - barrier: true # postgres depends on cloudnative-pg being installed
+  - include: services # deploy the rest of the manifests for all the services
+
+commonLabels:
+  devopsdirective.com/course: "kubernetes-course"

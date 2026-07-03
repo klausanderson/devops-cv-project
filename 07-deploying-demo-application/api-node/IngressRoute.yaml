@@ -1,0 +1,27 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: api-node
+  namespace: demo-app
+spec:
+  entryPoints:
+    - web
+  routes:
+    - kind: Rule
+      match: Host(`kubernetes-learning.klaus-devops-journey.com`) && PathPrefix(`/api/node`)
+      middlewares:
+        - name: strip-api-prefixes
+      services:
+        - kind: Service
+          name: api-node
+          port: 3000
+          scheme: http
+    - kind: Rule
+      match: Host(`34.116.233.31`) && PathPrefix(`/api/node`)
+      middlewares:
+        - name: strip-api-prefixes
+      services:
+        - kind: Service
+          name: api-node
+          port: 3000
+          scheme: http
