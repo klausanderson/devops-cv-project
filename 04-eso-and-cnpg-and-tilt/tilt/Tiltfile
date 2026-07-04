@@ -1,0 +1,4 @@
+include('../../02-Source-Code-and-Dockerfiles/api-golang/Tiltfile')
+include('../../02-Source-Code-and-Dockerfiles/api-node/Tiltfile')
+include('../../02-Source-Code-and-Dockerfiles/client-react/Tiltfile')
+include('../../02-Source-Code-and-Dockerfiles/load-generator-python/Tiltfile')

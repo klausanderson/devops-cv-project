@@ -1,0 +1,6 @@
+docker_build(
+  'klausanders444/kubernetes-learning-client-react-nginx', 
+  './',
+)
+k8s_yaml('../../03-Project-manifests/client-react/Deployment.yaml')
+k8s_resource('client-react-nginx', port_forwards=8080)
