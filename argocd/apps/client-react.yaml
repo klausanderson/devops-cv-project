@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: client-react
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/klausanderson/devops-cv-project
+    targetRevision: main
+    path: 03-Project-manifests/client-react
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: client-react-nginx
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

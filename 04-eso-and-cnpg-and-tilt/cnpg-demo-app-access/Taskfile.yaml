@@ -1,0 +1,27 @@
+version: "3"
+
+tasks:
+  01-create-service-account:
+    cmds:
+      - kubectl apply -f ServiceAccount.yaml
+    desc: "Create the Service Account in the demo-app namespace"
+
+  02-create-role-and-bind-to-SA:
+    cmds:
+      - kubectl apply -f RBAC.yaml
+    desc: "Create the role with the permissions for the specified resources and resource types and verbs"
+
+  03-create-cluster-secret-store:
+    cmds:
+      - kubectl apply -f ClusterSecretStore.yaml
+    desc: "Create the Cluster Secret Store to tell ESO to authenticate as cnpg-secret-reader and look into db namespace"
+
+  04-create-external-secret:
+    cmds:
+      - kubectl apply -f ExternalSecret.yaml
+    desc: "Apply the external secret definition which will be referenced in the deployments of api-golang and api-node"
+
+  05-execute-migration-in-database-instances:
+    cmds:
+      - kubectl apply -f Job-migrate.yaml
+    desc: "Execute the migration using the defined image of the postgres database within the created CNPG instances"

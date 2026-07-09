@@ -13,12 +13,7 @@ includes:
   load-generator-python:
     taskfile: ./load-generator-python/Taskfile.yaml
     dir: ./load-generator-python
-  postgresql:
-    taskfile: ./postgresql/Taskfile.yaml
-    dir: ./postgresql
 
-vars:
-  DATABASE_URL: "postgres://postgres:foobarbaz@localhost:5432/postgres"
 
 tasks:
   bootstrap-buildx-builder:

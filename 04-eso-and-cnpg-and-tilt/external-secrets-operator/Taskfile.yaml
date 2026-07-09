@@ -16,8 +16,7 @@ tasks:
           external-secrets/external-secrets \
           -n external-secrets \
           --values values.yaml \
-          --create-namespace \
-          --version 0.9.19
+          --create-namespace
 
   02-create-iam-service-account:
     desc: "Create GCP IAM service account and attach necessary permissions"

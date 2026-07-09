@@ -23,7 +23,7 @@ spec:
               value: "8000"
           envFrom:
             - secretRef:
-                name: api-golang-database-url
+                name: postgres-database-url
           ports:
             - containerPort: 8000
               protocol: TCP

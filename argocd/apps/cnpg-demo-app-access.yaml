@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cnpg-demo-app-access
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/klausanderson/devops-cv-project
+    targetRevision: main
+    path: 04-eso-and-cnpg-and-tilt/cnpg-demo-app-access
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: db
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

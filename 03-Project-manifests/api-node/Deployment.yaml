@@ -23,7 +23,7 @@ spec:
               value: "3000"
           envFrom:
             - secretRef:
-                name: api-node-database-url
+                name: postgres-database-url
           ports:
             - containerPort: 3000
               protocol: TCP

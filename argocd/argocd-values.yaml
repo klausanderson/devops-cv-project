@@ -1,0 +1,4 @@
+# argocd-values.yaml
+configs:
+  params:
+    server.insecure: true

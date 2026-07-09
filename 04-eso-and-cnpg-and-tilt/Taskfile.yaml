@@ -8,3 +8,11 @@ includes:
   tilt:
     taskfile: ./tilt/Taskfile.yaml
     dir: ./tilt
+    
+  cnpg:
+    taskfile: ./cloudnative-pg/Taskfile.yaml
+    dir: ./cloudnative-pg
+
+  cnpg-access:
+    taskfile: ./cnpg-demo-app-access/Taskfile.yaml
+    dir: ./cnpg-demo-app-access

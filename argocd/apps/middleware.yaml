@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: middleware
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/klausanderson/devops-cv-project
+    targetRevision: main
+    path: 03-Project-manifests/common
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: traefik
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

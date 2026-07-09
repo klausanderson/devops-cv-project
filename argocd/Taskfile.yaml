@@ -1,0 +1,53 @@
+version: "3"
+
+env: 
+  ARGOCD_SERVER: localhost:8081
+  ARCOCD_OPTS: "--core"
+tasks:
+  argocd-install:
+    cmds:
+      - kubectl create namespace argocd
+      - helm repo add argo https://argoproj.github.io/argo-helm
+      - helm install argocd argo/argo-cd -n argocd --create-namespace
+    desc: "Install the argocd operator with helm"
+  
+  argocd-login:
+    interactive: true
+    vars:
+      ARGOCD_HOST: argocd.klaus-devops-journey.com
+    cmds:
+      - argocd login {{.ARGOCD_HOST}} --grpc-web
+    desc: "Log into ArgoCD CLI via ingress (grpc-web transport)"
+
+  argocd-change-pass:
+    cmds:
+      - argocd account update-password
+    desc: "Change password for the account"
+  
+  argocd-give-access-to-git-repo:
+    cmds:
+      ##- |
+      ##  argocd repo add https://github.com/klausanderson/devops-cv-project \
+      ##  --server=${ARGOCD_SERVER} \
+      ##  --username klausanderson \
+      ##  --password=${GITPAT}
+      - |
+        argocd repo add https://github.com/klausanderson/devops-cv-project \
+        --core
+    desc: "Give access to public git repo for argocd"
+
+  argocd-apply-root-app:
+    cmds:
+      - kubectl apply -f argocd/root-app.yaml
+    desc: "Apply the root-app resource manifest, the only manual step"
+
+  apply-argocd-certificate-and-ingress-route:
+    cmds:
+      - kubectl apply -f ../03-Project-manifests/argocd-ingress/Certificate.yaml
+
+  apply-argocd-ingress-route:
+    cmds:
+      - kubectl apply -f ../03-Project-manifests/argocd-ingress/IngressRoute.yaml
+      - kubectl describe certificate argocd-server-tls -n traefik
+
+  

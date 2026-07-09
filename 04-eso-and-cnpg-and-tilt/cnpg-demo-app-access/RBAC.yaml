@@ -1,0 +1,24 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: read-cnpg-app-secret
+  namespace: db
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    resourceNames: ["cnpg-minimal-app"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: read-cnpg-app-secret-binding
+  namespace: db
+subjects:
+  - kind: ServiceAccount
+    name: cnpg-secret-reader
+    namespace: demo-app
+roleRef:
+  kind: Role
+  name: read-cnpg-app-secret
+  apiGroup: rbac.authorization.k8s.io
