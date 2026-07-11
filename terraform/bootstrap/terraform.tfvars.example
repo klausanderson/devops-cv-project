@@ -1,0 +1,3 @@
+gcp_project_id       = "k8s-learning-gke"
+gcp_region           = "europe-central2"
+tf_state_bucket_name = "klaus-devops-journey-tfstate"

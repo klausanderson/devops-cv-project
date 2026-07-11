@@ -1,0 +1,17 @@
+# Copy this to terraform.tfvars and fill in the real values.
+# terraform.tfvars itself is gitignored - never commit it.
+
+gcp_project_id = "k8s-learning-gke"
+# gcp_region, gcp_zone, gcp_network_name, gke_cluster_name all have sane
+# defaults in variables.tf matching the current Taskfile - override only
+# if you're diverging from that.
+
+azure_subscription_id = "65b5b7d2-d95d-4de3-ba61-b7b49d12519b"
+
+# Must be globally unique - pick something you're confident nobody else has taken
+azure_storage_account_name = "klausdevopscnpgbackup"
+cnpg_backup_bucket_name    = "klaus-devops-journey-cnpg-backups"
+
+# Resource ID of your existing Azure Key Vault, e.g.:
+# /subscriptions/<sub-id>/resourceGroups/<rg>/providers/Microsoft.KeyVault/vaults/<vault-name>
+azure_key_vault_id = "/subscriptions/REPLACE_ME/resourceGroups/REPLACE_ME/providers/Microsoft.KeyVault/vaults/REPLACE_ME"

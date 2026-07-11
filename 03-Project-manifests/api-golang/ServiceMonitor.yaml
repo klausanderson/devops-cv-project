@@ -1,0 +1,15 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: api-golang
+  namespace: demo-app
+  labels:
+    release: kube-prometheus-stack
+spec:
+  selector:
+    matchLabels:
+      app: api-golang        # must match Service's selector labels
+  endpoints:
+    - port: http              # must match Service.yaml's spec.ports[].name exactly
+      path: /metrics
+      interval: 30s

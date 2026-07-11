@@ -1246,6 +1246,86 @@
         }
       }
     },
+    "prometheus@latest": {
+      "last_modified": "2026-07-05T19:27:47Z",
+      "resolved": "github:NixOS/nixpkgs/f205b5574fd0cb7da5b702a2da51507b7f4fdd1b#prometheus",
+      "source": "devbox-search",
+      "version": "3.12.0",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/2gz68l5bzm3bfz99x88bbp8g1lhc5qj7-prometheus-3.12.0",
+              "default": true
+            },
+            {
+              "name": "cli",
+              "path": "/nix/store/cjxkiawkmrbckicdh2b0ad5qvq1pzgkm-prometheus-3.12.0-cli"
+            },
+            {
+              "name": "doc",
+              "path": "/nix/store/zpll5dlg012q6qm221cc9riydlwbc7gk-prometheus-3.12.0-doc"
+            }
+          ],
+          "store_path": "/nix/store/2gz68l5bzm3bfz99x88bbp8g1lhc5qj7-prometheus-3.12.0"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/2s6swdpg62x1sx2abh7z3bx2qs73pgih-prometheus-3.12.0",
+              "default": true
+            },
+            {
+              "name": "cli",
+              "path": "/nix/store/ygx9wp3h7jaj4ixyrqaikh8rlidr022l-prometheus-3.12.0-cli"
+            },
+            {
+              "name": "doc",
+              "path": "/nix/store/zrwsy0wh2pr0a4v9g03axrs6fcnrqdjr-prometheus-3.12.0-doc"
+            }
+          ],
+          "store_path": "/nix/store/2s6swdpg62x1sx2abh7z3bx2qs73pgih-prometheus-3.12.0"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/n44wpv45dq811vm3687s5h8ifkyxgl3z-prometheus-3.12.0",
+              "default": true
+            },
+            {
+              "name": "cli",
+              "path": "/nix/store/996ks8jlbmfy8s0yymvcnjxzb4zwrsp7-prometheus-3.12.0-cli"
+            },
+            {
+              "name": "doc",
+              "path": "/nix/store/sr2sicb6vpcgnhsyf0l5qxbczfb7pir8-prometheus-3.12.0-doc"
+            }
+          ],
+          "store_path": "/nix/store/n44wpv45dq811vm3687s5h8ifkyxgl3z-prometheus-3.12.0"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/6p845wjwwak4jy1br0cpjanqvlbxin06-prometheus-3.12.0",
+              "default": true
+            },
+            {
+              "name": "cli",
+              "path": "/nix/store/1jalasbc9yr8740mv7g6km5kxv57v77g-prometheus-3.12.0-cli"
+            },
+            {
+              "name": "doc",
+              "path": "/nix/store/69wbw4ijc7lpm0hfjpfs91535xxdww3j-prometheus-3.12.0-doc"
+            }
+          ],
+          "store_path": "/nix/store/6p845wjwwak4jy1br0cpjanqvlbxin06-prometheus-3.12.0"
+        }
+      }
+    },
     "python312@latest": {
       "last_modified": "2024-05-22T06:18:38Z",
       "plugin_version": "0.0.5",

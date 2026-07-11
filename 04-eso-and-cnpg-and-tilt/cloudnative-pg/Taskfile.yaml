@@ -49,12 +49,12 @@ tasks:
       - cmd: gum style "Attach roles/storage.objectAdmin and roles/storage.legacyBucketReader to IAM service account for backup bucket"
         silent: true
       - |
-        gsutil iam ch \
-          serviceAccount:cnpg-backups@k8s-learning-gke.iam.gserviceaccount.com:roles/storage.objectAdmin \
-          gs://{{.BUCKET_NAME}}
-        gsutil iam ch \
-          serviceAccount:cnpg-backups@k8s-learning-gke.iam.gserviceaccount.com:roles/storage.legacyBucketReader \
-          gs://{{.BUCKET_NAME}}
+        gcloud storage buckets add-iam-policy-binding gs://{{.BUCKET_NAME}} \
+          --member="serviceAccount:cnpg-backups@k8s-learning-gke.iam.gserviceaccount.com" \
+          --role="roles/storage.objectAdmin"
+        gcloud storage buckets add-iam-policy-binding gs://{{.BUCKET_NAME}} \
+          --member="serviceAccount:cnpg-backups@k8s-learning-gke.iam.gserviceaccount.com" \
+          --role="roles/storage.legacyBucketReader"
 
       - cmd: gum style "Attach roles/iam.workloadIdentityUser to kubernetes service account"
         silent: true

@@ -28,7 +28,8 @@
     "tilt@latest",
     "yq-go@latest",
     "argocd@latest",
-    "terraform@latest"
+    "terraform@latest",
+    "prometheus@latest"
   ],
   "shell": {
     "init_hook": [

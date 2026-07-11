@@ -1,0 +1,17 @@
+grafana:
+  admin:
+    existingSecret: grafana-admin-credentials
+    userKey: admin-user
+    passwordKey: admin-password
+  ingress:
+    enabled: false   # Traefik handles TLS termination, not the chart's ingress
+  sidecar:
+    dashboards:
+      enabled: true
+      label: grafana_dashboard
+      labelValue: "1"
+
+prometheus:
+  prometheusSpec:
+    serviceMonitorSelectorNilUsesHelmValues: false   # pick up ServiceMonitors across namespaces, not just the release's own labels
+    podMonitorSelectorNilUsesHelmValues: false

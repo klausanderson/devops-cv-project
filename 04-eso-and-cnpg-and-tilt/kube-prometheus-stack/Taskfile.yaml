@@ -1,0 +1,82 @@
+# 04-eso-and-cnpg-and-tilt/kube-prometheus-stack/Taskfile.yaml
+version: '3'
+
+vars:
+  NAMESPACE: monitoring
+  RELEASE_NAME: kube-prometheus-stack
+  CHART_REPO: https://prometheus-community.github.io/helm-charts
+  CHART_NAME: prometheus-community/kube-prometheus-stack
+  CHART_VERSION: 65.5.1
+  VALUES_FILE: '{{.TASKFILE_DIR}}/values.yaml'
+  GCP_PROJECT: k8s-learning-gke
+tasks:
+
+  helm-repo-add:
+    desc: Add/update the prometheus-community Helm repo locally
+    cmds:
+      - helm repo add prometheus-community {{.CHART_REPO}} --force-update
+      - helm repo update
+    silent: true
+
+  helm-template-preview:
+    desc: >
+      Render the chart locally with our values.yaml and print it — read-only,
+      for learning what the chart actually generates. Does NOT apply anything
+      and is not consumed by ArgoCD; ArgoCD renders this same chart itself
+      when it syncs argocd/apps/kube-prometheus-stack.yaml.
+    deps: [helm-repo-add]
+    cmds:
+      - helm template {{.RELEASE_NAME}} {{.CHART_NAME}} --version {{.CHART_VERSION}} --namespace {{.NAMESPACE}} --values {{.VALUES_FILE}} | less
+
+  helm-install:
+    desc: >
+      Manual/imperative install, same command ArgoCD runs under the hood.
+      Useful against the KinD sandbox (01-KinD-Azure-GCP-setup) or for a
+      one-off bootstrap before the ArgoCD Application exists, so you can
+      see the exact `helm install` this component maps to rather than only
+      ever experiencing it through ArgoCD's UI.
+    deps: [helm-repo-add]
+    cmds:
+      - >
+        helm upgrade --install {{.RELEASE_NAME}} {{.CHART_NAME}}
+        --version {{.CHART_VERSION}}
+        --namespace {{.NAMESPACE}} --create-namespace
+        --values {{.VALUES_FILE}}
+
+  helm-uninstall:
+    desc: Remove the manual install (does not touch ArgoCD-managed releases)
+    cmds:
+      - helm uninstall {{.RELEASE_NAME}} --namespace {{.NAMESPACE}}
+
+  port-forward:
+    desc: Local Grafana access, bypassing Traefik for quick debugging
+    cmds:
+      - kubectl port-forward -n {{.NAMESPACE}} svc/{{.RELEASE_NAME}}-grafana 3000:80
+
+  verify-targets:
+    desc: Confirm Prometheus is actually scraping api-golang / api-node
+    cmds:
+      - kubectl port-forward -n {{.NAMESPACE}} svc/{{.RELEASE_NAME}}-prometheus 9091:9090 &
+      - sleep 2
+      - |
+        curl -s 'http://localhost:9091/api/v1/targets' | jq '.data.activeTargets[] | select(.labels.job | test("api-golang|api-node")) | {job: .labels.job, health: .health}'
+  
+  
+  create-grafana-secrets-gcpsm:
+    desc: >
+      Reference: commands to create the Grafana admin credentials directly
+      in GCP Secret Manager. Run manually, once. ESO's ClusterSecretStore
+      reads these by name (grafana-admin-user, grafana-admin-password) into
+      the grafana-admin-credentials Secret in-cluster — this task doesn't
+      seed or automate anything, just documents the exact gcloud commands.
+    cmds:
+      - echo -n "admin" | gcloud secrets create grafana-admin-user --project={{.GCP_PROJECT}} --data-file=-
+      - openssl rand -base64 24 | gcloud secrets create grafana-admin-password --project={{.GCP_PROJECT}} --data-file=-
+
+  read-grafana-secrets-gcpsm:
+    desc: Read back what's currently stored in GCP Secret Manager for Grafana admin
+    cmds:
+      - gcloud secrets versions access latest --secret=grafana-admin-user --project={{.GCP_PROJECT}}
+      - echo
+      - gcloud secrets versions access latest --secret=grafana-admin-password --project={{.GCP_PROJECT}}
+      - echo

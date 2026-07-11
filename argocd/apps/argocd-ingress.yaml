@@ -11,7 +11,7 @@ spec:
     path: 03-Project-manifests/argocd-ingress
   destination:
     server: https://kubernetes.default.svc
-    namespace: cert-manager
+    namespace: traefik
   syncPolicy:
     automated:
       prune: true
