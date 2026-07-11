@@ -1,0 +1,162 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dashboard-api-node-runtime
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"
+data:
+  api-node-runtime.json: |
+    {
+      "uid": "api-node-runtime",
+      "title": "API Node - Runtime Overview",
+      "tags": ["api-node", "demo-app", "nodejs-runtime"],
+      "timezone": "browser",
+      "schemaVersion": 39,
+      "version": 1,
+      "time": { "from": "now-6h", "to": "now" },
+      "refresh": "30s",
+      "templating": {
+        "list": [
+          { "name": "datasource", "type": "datasource", "query": "prometheus", "current": {} }
+        ]
+      },
+      "panels": [
+        {
+          "id": 1,
+          "title": "Event loop lag",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 8, "x": 0, "y": 0 },
+          "datasource": { "type": "prometheus", "uid": "$datasource" },
+          "targets": [
+            {
+              "expr": "nodejs_eventloop_lag_seconds{job=\"api-node\"}",
+              "legendFormat": "mean lag",
+              "refId": "A"
+            },
+            {
+              "expr": "nodejs_eventloop_lag_p99_seconds{job=\"api-node\"}",
+              "legendFormat": "p99 lag",
+              "refId": "B"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": { "unit": "s" },
+            "overrides": []
+          }
+        },
+        {
+          "id": 2,
+          "title": "CPU usage rate",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 8, "x": 8, "y": 0 },
+          "datasource": { "type": "prometheus", "uid": "$datasource" },
+          "targets": [
+            {
+              "expr": "rate(process_cpu_seconds_total{job=\"api-node\"}[5m])",
+              "legendFormat": "cpu seconds/sec",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "title": "Active handles / requests",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 8, "x": 16, "y": 0 },
+          "datasource": { "type": "prometheus", "uid": "$datasource" },
+          "targets": [
+            {
+              "expr": "nodejs_active_handles_total{job=\"api-node\"}",
+              "legendFormat": "handles",
+              "refId": "A"
+            },
+            {
+              "expr": "nodejs_active_requests_total{job=\"api-node\"}",
+              "legendFormat": "requests",
+              "refId": "B"
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "title": "Memory - heap vs resident",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+          "datasource": { "type": "prometheus", "uid": "$datasource" },
+          "targets": [
+            {
+              "expr": "nodejs_heap_size_used_bytes{job=\"api-node\"}",
+              "legendFormat": "heap used",
+              "refId": "A"
+            },
+            {
+              "expr": "process_resident_memory_bytes{job=\"api-node\"}",
+              "legendFormat": "RSS",
+              "refId": "B"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": { "unit": "bytes" },
+            "overrides": []
+          }
+        },
+        {
+          "id": 5,
+          "title": "GC duration by kind (avg)",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+          "datasource": { "type": "prometheus", "uid": "$datasource" },
+          "targets": [
+            {
+              "expr": "rate(nodejs_gc_duration_seconds_sum{job=\"api-node\"}[5m]) / rate(nodejs_gc_duration_seconds_count{job=\"api-node\"}[5m])",
+              "legendFormat": "{{kind}}",
+              "refId": "A"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": { "unit": "s" },
+            "overrides": []
+          }
+        },
+        {
+          "id": 6,
+          "title": "Scrape target up",
+          "type": "stat",
+          "gridPos": { "h": 4, "w": 6, "x": 0, "y": 16 },
+          "datasource": { "type": "prometheus", "uid": "$datasource" },
+          "targets": [
+            {
+              "expr": "up{job=\"api-node\"}",
+              "refId": "A"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "mappings": [
+                { "type": "value", "options": { "0": { "text": "DOWN", "color": "red" }, "1": { "text": "UP", "color": "green" } } }
+              ]
+            },
+            "overrides": []
+          }
+        },
+        {
+          "id": 7,
+          "title": "Heap space breakdown",
+          "type": "timeseries",
+          "gridPos": { "h": 4, "w": 6, "x": 6, "y": 16 },
+          "datasource": { "type": "prometheus", "uid": "$datasource" },
+          "targets": [
+            {
+              "expr": "nodejs_heap_space_size_used_bytes{job=\"api-node\"}",
+              "legendFormat": "{{space}}",
+              "refId": "A"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": { "unit": "bytes" },
+            "overrides": []
+          }
+        }
+      ]
+    }
