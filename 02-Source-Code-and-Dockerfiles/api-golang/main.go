@@ -9,6 +9,8 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"api-golang/database"
+	
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 func init() {
@@ -51,6 +53,8 @@ func main() {
 		c.JSON(200, "pong")
 	})
 
+	r.GET("/metrics", gin.WrapH(promhttp.Handler())) //important for the /metrics path so Prometheus can scrape the pod IP at that path
+	
 	port := os.Getenv("PORT")
 	if port == "" {
 		// Defaulting to 8000 to deconflict with unprivileged nginx container
