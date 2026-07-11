@@ -8,7 +8,7 @@ metadata:
 spec:
   secretName: grafana-tls
   dnsNames:
-    - grafana.yourdomain.com
+    - grafana.klaus-devops-journey.com
   issuerRef:
     name: letsencrypt-prod
     kind: ClusterIssuer
