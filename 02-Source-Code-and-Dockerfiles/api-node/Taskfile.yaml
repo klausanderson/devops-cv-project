@@ -3,7 +3,7 @@ version: "3"
 vars:
   DATABASE_URL: "postgres://postgres:foobarbaz@localhost:5432/postgres"
   IMAGE_REPO: klausanders444/kubernetes-learning-api-node
-  IMAGE_TAG: foobarbaz
+  IMAGE_TAG: final
 
 tasks:
   build-container-image:
