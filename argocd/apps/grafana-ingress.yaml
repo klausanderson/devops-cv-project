@@ -11,7 +11,7 @@ spec:
     path: 03-Project-manifests/grafana-ingress
   destination:
     server: https://kubernetes.default.svc
-    namespace: monitoring
+    namespace: traefik
   syncPolicy:
     automated:
       prune: true

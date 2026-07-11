@@ -4,6 +4,13 @@ providers:
   kubernetesCRD:
     enabled: true
     allowCrossNamespace: true
+
+
+api:
+  dashboard: true
+  insecure: true
+
+
 ports:
   web:
     port: 8081
@@ -12,6 +19,12 @@ ports:
     http:
       tls:
         enabled: true
+  traefik:
+    port: 9000
+    expose:
+      default: false   # keep this off the public LoadBalancer — insecure mode has 
+      #zero auth, so it staying unreachable from the internet 
+      #is what makes insecure:true safe here
 
 ingressRoute:
   dashboard:
