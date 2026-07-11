@@ -14,4 +14,6 @@ grafana:
 prometheus:
   prometheusSpec:
     serviceMonitorSelectorNilUsesHelmValues: false   # pick up ServiceMonitors across namespaces, not just the release's own labels
+    serviceMonitorNamespaceSelector: {}
     podMonitorSelectorNilUsesHelmValues: false
+    podMonitorNamespaceSelector: {}

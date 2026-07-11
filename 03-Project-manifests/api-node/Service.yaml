@@ -3,10 +3,13 @@ kind: Service
 metadata:
   name: api-node
   namespace: demo-app
+  labels: 
+    app: api-node
 spec:
   selector:
     app: api-node
   ports:
-    - protocol: TCP
+    - name: http
+      protocol: TCP
       port: 3000
       targetPort: 3000

@@ -55,10 +55,10 @@ tasks:
   verify-targets:
     desc: Confirm Prometheus is actually scraping api-golang / api-node
     cmds:
-      - kubectl port-forward -n {{.NAMESPACE}} svc/{{.RELEASE_NAME}}-prometheus 9091:9090 &
-      - sleep 2
-      - |
-        curl -s 'http://localhost:9091/api/v1/targets' | jq '.data.activeTargets[] | select(.labels.job | test("api-golang|api-node")) | {job: .labels.job, health: .health}'
+      - kubectl port-forward -n {{.NAMESPACE}} svc/{{.RELEASE_NAME}}-prometheus 9091:9090
+      #- sleep 2
+      #- |
+      #  curl -s 'http://localhost:9091/api/v1/targets' | jq '.data.activeTargets[] | select(.labels.job | test("api-golang|api-node")) | {job: .labels.job, health: .health}'
   
   
   create-grafana-secrets-gcpsm:
