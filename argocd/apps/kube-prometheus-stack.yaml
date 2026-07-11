@@ -18,6 +18,9 @@ spec:
     - repoURL: https://github.com/klausanderson/devops-cv-project
       targetRevision: main
       ref: values
+    - repoURL: https://github.com/klausanderson/devops-cv-project
+      targetRevision: main
+      path: 04-eso-and-cnpg-and-tilt/kube-prometheus-stack/manifests
   destination:
     server: https://kubernetes.default.svc
     namespace: monitoring

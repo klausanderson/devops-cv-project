@@ -10,7 +10,7 @@ spec:
   source:
     repoURL: https://github.com/klausanderson/devops-cv-project
     targetRevision: main
-    path: 04-eso-and-cnpg-and-tilt/cloudnative-pg
+    path: 04-eso-and-cnpg-and-tilt/cloudnative-pg/manifests
   destination:
     server: https://kubernetes.default.svc
     namespace: db

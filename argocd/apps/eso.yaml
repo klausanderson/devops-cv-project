@@ -10,7 +10,7 @@ spec:
   source:
     repoURL: https://github.com/klausanderson/devops-cv-project
     targetRevision: main
-    path: 04-eso-and-cnpg-and-tilt/external-secrets-operator
+    path: 04-eso-and-cnpg-and-tilt/external-secrets-operator/manifests
   destination:
     server: https://kubernetes.default.svc
     namespace: external-secrets

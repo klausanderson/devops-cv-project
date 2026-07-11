@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: https://github.com/klausanderson/devops-cv-project
     targetRevision: main
-    path: 03-Project-manifests/common
+    path: 03-Project-manifests/common/manifests
   destination:
     server: https://kubernetes.default.svc
     namespace: traefik

@@ -10,7 +10,7 @@ spec:
   source:
     repoURL: https://github.com/klausanderson/devops-cv-project
     targetRevision: main
-    path: 04-eso-and-cnpg-and-tilt/cnpg-demo-app-access
+    path: 04-eso-and-cnpg-and-tilt/cnpg-demo-app-access/manifests
   destination:
     server: https://kubernetes.default.svc
     namespace: db
