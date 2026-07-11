@@ -3,8 +3,6 @@ kind: IngressRoute
 metadata:
   name: grafana
   namespace: traefik
-  annotations:
-    argocd.argoproj.io/sync-wave: "1"
 spec:
   entryPoints:
     - websecure
@@ -12,7 +10,7 @@ spec:
     - match: Host(`grafana.klaus-devops-journey.com`)
       kind: Rule
       services:
-        - name: kube-prometheus-stack   # match Helm release name
+        - name: kube-prometheus-stack-grafana   # match Helm release name
           namespace: monitoring
           port: 80
   tls:
