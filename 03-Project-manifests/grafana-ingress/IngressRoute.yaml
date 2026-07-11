@@ -12,7 +12,7 @@ spec:
     - match: Host(`grafana.klaus-devops-journey.com`)
       kind: Rule
       services:
-        - name: kube-prometheus-stack-grafana   # match your Helm release name
+        - name: kube-prometheus-stack   # match Helm release name
           port: 80
   tls:
     secretName: grafana-tls

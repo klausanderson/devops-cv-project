@@ -1,4 +1,3 @@
-# 04-eso-and-cnpg-and-tilt/kube-prometheus-stack/Taskfile.yaml
 version: '3'
 
 vars:
