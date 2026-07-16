@@ -31,30 +31,11 @@ tasks:
             fi
           done
 
-  check-new-tag-var:
-    desc: "Check if NEW_TAG variable is set"
+  update-app-image-tags:
+    desc: "Update image tags for ArgoCD-managed application manifests"
     cmds:
-      - cmd: |
-          if [ -z "{{.NEW_TAG}}" ] ; then
-            echo "NEW_TAG var is required" && exit 1;
-          fi
-
-  update-staging-image-tags:
-    desc: "Update image tags for kluctl staging config"
-    cmds:
-      - task: check-new-tag-var
       - task: update-image-tags
         vars:
-          IDENTIFIER_COMMENT: "# STAGING_IMAGE_TAG"
-          STARTING_PATH:
-            sh: git rev-parse --show-toplevel
-
-  update-production-image-tags:
-    desc: "Update image tags for kluctl production config"
-    cmds:
-      - task: check-new-tag-var
-      - task: update-image-tags
-        vars:
-          IDENTIFIER_COMMENT: "# PRODUCTION_IMAGE_TAG"
+          IDENTIFIER_COMMENT: "# APP_IMAGE_TAG"
           STARTING_PATH:
             sh: git rev-parse --show-toplevel

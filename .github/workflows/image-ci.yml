@@ -29,7 +29,7 @@ jobs:
 
       - name: Generate Image Tag
         id: generate-image-tag
-        working-directory: 05-cicd-github-actions-kluctl-gitops/github-actions
+        working-directory: 05-cicd-github-actions/github-actions
         run: |
           image_tag=$(task generate-version-tag)
           echo "image_tag=$image_tag" >> $GITHUB_OUTPUT
@@ -98,21 +98,15 @@ jobs:
           version: 3.x
 
       - name: Update Image Tags
-        working-directory: 05-cicd-github-actions-kluctl-gitops/github-actions
+        working-directory: 05-cicd-github-actions/github-actions
         env:
           IMAGE_TAG: ${{ needs.generate-image-tag.outputs.image_tag }}
         run: |
-          # Update staging tags for push to main or release tag
-          task update-staging-image-tags NEW_TAG=${IMAGE_TAG}            
-
-          # Update production tags only for release tags
-          if [[ $GITHUB_REF == refs/tags/*.*.* ]]; then
-            task update-production-image-tags NEW_TAG=${IMAGE_TAG}
-          fi
+          task update-app-image-tags NEW_TAG=${IMAGE_TAG}
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v6
         with:
           base: main
-          token: ${{ secrets.DEVOPS_DIRECTIVE_KUBERNETES_COURSE_GITHUB_ACTION_PAT }}
+          token: ${{ secrets.DEVOPS_CV_PROJECT_GITHUB_ACTION_PAT }}
           title: "Update image tags to (${{ needs.generate-image-tag.outputs.image_tag }})"
