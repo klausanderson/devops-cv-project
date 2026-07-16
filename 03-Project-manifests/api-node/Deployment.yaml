@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: api-node
-          image: klausanders444/kubernetes-learning-api-node:1.0.6 # APP_IMAGE_TAG
+          image: klausanders444/kubernetes-learning-api-node:1.0.7 # APP_IMAGE_TAG
           env:
             - name: PORT
               value: "3000"
