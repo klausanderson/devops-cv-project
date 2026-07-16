@@ -16,7 +16,7 @@ spec:
         app: client-react-nginx
     spec:
       containers:
-        - image: klausanders444/kubernetes-learning-client-react-nginx:foobarbaz
+        - image: klausanders444/kubernetes-learning-client-react-nginx:1.04 # APP_IMAGE_TAG
           name: client-react-nginx
           ports:
             - containerPort: 8080
