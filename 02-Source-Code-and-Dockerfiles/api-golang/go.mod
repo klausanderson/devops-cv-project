@@ -1,6 +1,6 @@
 module api-golang
 
-go 1.23.0
+go 1.26.0
 
 require (
 	github.com/gin-gonic/gin v1.8.2
