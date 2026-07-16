@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: load-generator
-          image: klausanders444/kubernetes-learning-load-generator-python:1.04 # APP_IMAGE_TAG
+          image: klausanders444/kubernetes-learning-load-generator-python:1.0.6 # APP_IMAGE_TAG
           imagePullPolicy: Always
           env:
             - name: API_URL
