@@ -8,7 +8,7 @@ providers:
 
 api:
   dashboard: true
-  insecure: true
+  insecure: true # no authentication needed
 
 
 ports:
@@ -20,7 +20,7 @@ ports:
       tls:
         enabled: true
   traefik:
-    port: 9000
+    port: 9000 # expose port 9000 of the pod as entrypoint for traefik UI
     expose:
       default: false   # keep this off the public LoadBalancer — insecure mode has 
       #zero auth, so it staying unreachable from the internet 

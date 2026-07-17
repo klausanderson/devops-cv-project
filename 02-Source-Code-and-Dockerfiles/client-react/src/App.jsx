@@ -26,7 +26,7 @@ const SERVICES = [
     label: "Node.js API",
     language: "Node.js (Express)",
     description:
-      "Written in Node.js with Express. Shares the same Postgres cluster as the Go service — a deliberately polyglot pair behind one ingress.",
+      "Written in Node.js with Express. Shares the same Postgres cluster as the Go service and also sexposes /metrics for Prometheus scraping.",
   },
 ];
 
@@ -95,14 +95,12 @@ export function App() {
     <QueryClientProvider client={queryClient}>
       <div className="App">
         <header className="app-header">
-          <h1>Multi-Cloud DevOps Portfolio</h1>
+          <h1>DevOps Portfolio Project</h1>
           <p>
-            A 3-tier cloud-native app running across GKE and AKS, tied
+            A 3-tier cloud-native app running on GKE, tied
             together with ArgoCD, Traefik, and CloudNativePG. Both APIs below
             sit behind the same ingress path prefix, which Traefik's
-            middleware strips before the request reaches either backend — so
-            the routing you see here is identical no matter which cluster
-            actually serves it.
+            middleware strips before the request reaches either backend.
           </p>
         </header>
 
