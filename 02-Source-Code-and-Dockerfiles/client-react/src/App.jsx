@@ -26,7 +26,7 @@ const SERVICES = [
     label: "Node.js API",
     language: "Node.js (Express)",
     description:
-      "Written in Node.js with Express. Shares the same Postgres cluster as the Go service and also sexposes /metrics for Prometheus scraping.",
+      "Written in Node.js with Express. Shares the same Postgres cluster as the Go service and also exposes /metrics for Prometheus scraping.",
   },
 ];
 
