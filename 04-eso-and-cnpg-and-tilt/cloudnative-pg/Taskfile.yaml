@@ -61,7 +61,7 @@ tasks:
       - |
         gcloud iam service-accounts add-iam-policy-binding cnpg-backups@k8s-learning-gke.iam.gserviceaccount.com \
           --role roles/iam.workloadIdentityUser \
-          --member "serviceAccount:k8s-learning-gke.svc.id.goog[09--cnpg/cnpg-with-backup-config]"
+          --member "serviceAccount:k8s-learning-gke.svc.id.goog[cnpg/cnpg-with-backup-config]"
 
   06-apply-cluster-with-backup-config-gcp:
     desc: "Apply cnpg cluster definition with backup configuration"

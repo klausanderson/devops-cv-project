@@ -44,8 +44,3 @@ variable "node_count" {
   default = 2
 }
 
-variable "enable_gateway_api" {
-  description = "Applies the Gateway API add-on via az CLI local-exec (see main.tf note). Set false if you don't want a local-exec provisioner in your plan."
-  type        = bool
-  default     = true
-}

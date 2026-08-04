@@ -32,22 +32,3 @@ resource "azurerm_kubernetes_cluster" "this" {
     type = "SystemAssigned"
   }
 }
-
-# The azurerm provider does not (yet) expose AKS's managed Gateway API
-# add-on as a native attribute on azurerm_kubernetes_cluster - it's tracked
-# upstream (hashicorp/terraform-provider-azurerm#31710) and still open.
-# Until it lands, this replicates `az aks create --enable-gateway-api` via
-# az CLI local-exec so the module output still matches the old Taskfile
-# behavior. Requires the Azure CLI to be authenticated wherever `terraform
-# apply` runs (e.g. in your CI runner).
-resource "null_resource" "enable_gateway_api" {
-  count = var.enable_gateway_api ? 1 : 0
-
-  triggers = {
-    cluster_id = azurerm_kubernetes_cluster.this.id
-  }
-
-  provisioner "local-exec" {
-    command = "az aks update --resource-group ${var.resource_group_name} --name ${var.cluster_name} --enable-gateway-api"
-  }
-}

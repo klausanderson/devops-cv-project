@@ -10,7 +10,6 @@ env:
   PADDING: "1 1"
   MARGIN: "1 1"
 
-  SUB_ID_AZURE: 65b5b7d2-d95d-4de3-ba61-b7b49d12519b
   RESOURCE_GROUP: azure-devops-learning
   LOCATION: polandcentral
 
@@ -18,7 +17,7 @@ tasks:
   azure:01-init-azure-cli:
     cmds:
       - az login
-      - az account set --subscription "${SUB_ID_AZURE}"
+      ##- az account set --subscription "${SUB_ID_AZURE}"
     desc: "Authenticate to Azure CLI"
 
   azure:02-giving-permissions-to-create:

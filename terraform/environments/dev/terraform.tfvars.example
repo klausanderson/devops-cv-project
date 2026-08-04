@@ -15,3 +15,8 @@ cnpg_backup_bucket_name    = "klaus-devops-journey-cnpg-backups"
 # Resource ID of your existing Azure Key Vault, e.g.:
 # /subscriptions/<sub-id>/resourceGroups/<rg>/providers/Microsoft.KeyVault/vaults/<vault-name>
 azure_key_vault_id = "/subscriptions/REPLACE_ME/resourceGroups/REPLACE_ME/providers/Microsoft.KeyVault/vaults/REPLACE_ME"
+
+# --- AWS ---
+# Region default is eu-central-1 (Frankfurt). Credentials come from your
+# environment (aws configure / AWS_PROFILE / SSO), never from tfvars.
+cnpg_backup_s3_bucket_name = "klaus-devops-journey-cnpg-backups-aws"

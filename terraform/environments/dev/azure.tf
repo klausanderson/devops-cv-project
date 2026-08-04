@@ -22,7 +22,6 @@ module "aks" {
   node_vm_size           = var.aks_node_vm_size
   node_os_disk_size_gb   = var.aks_node_os_disk_size_gb
   node_count             = var.aks_node_count
-  enable_gateway_api    = true
 }
 
 # CNPG backup storage (Azure Blob equivalent of the GCS bucket)
