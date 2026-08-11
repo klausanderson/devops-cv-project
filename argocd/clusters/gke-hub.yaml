@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: gke-hub
+  namespace: argocd
+  labels:
+    argocd.argoproj.io/secret-type: cluster
+    cloud: gcp
+type: Opaque
+stringData:
+  name: gke-hub
+  server: https://kubernetes.default.svc
+  config: '{"tlsClientConfig":{"insecure":false}}'

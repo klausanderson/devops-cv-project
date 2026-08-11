@@ -1,3 +1,0 @@
-serviceAccount:
-  annotations:
-    iam.gke.io/gcp-service-account: external-secrets@k8s-learning-gke.iam.gserviceaccount.com

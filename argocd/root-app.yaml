@@ -8,7 +8,9 @@ spec:
   source:
     repoURL: https://github.com/klausanderson/devops-cv-project
     targetRevision: main
-    path: argocd/apps
+    path: argocd/applicationsets
+    directory:
+      recurse: false
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd

@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: hub-only-apps
+  namespace: argocd
+spec:
+  goTemplate: true
+  generators:
+    - list:
+        elements:
+          - app: argocd-ingress
+            path: 03-Project-manifests/argocd-ingress
+            namespace: argocd
+            cluster: gke-hub
+  template:
+    metadata:
+      name: '{{.app}}'
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/klausanderson/devops-cv-project
+        targetRevision: main
+        path: '{{.path}}'
+      destination:
+        name: '{{.cluster}}'
+        namespace: '{{.namespace}}'
+      syncPolicy:
+        automated: { prune: true, selfHeal: true }

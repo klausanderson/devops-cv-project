@@ -1,0 +1,55 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: cloud-specific-charts
+  namespace: argocd
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+    - matrix:
+        generators:
+          - list:
+              elements:
+                - app: eso
+                  chart: external-secrets
+                  chartRepo: https://charts.external-secrets.io
+                  chartVersion: 2.9.0
+                  valuesPath: 04-eso-and-cnpg-and-tilt/external-secrets-operator
+                  namespace: external-secrets
+                  syncWave: "1"
+                - app: kube-prometheus-stack
+                  chart: kube-prometheus-stack
+                  chartRepo: https://prometheus-community.github.io/helm-charts
+                  chartVersion: 65.5.1
+                  valuesPath: 04-eso-and-cnpg-and-tilt/kube-prometheus-stack
+                  namespace: monitoring
+                  syncWave: "3"
+          - clusters:
+              selector:
+                matchLabels:
+                  argocd.argoproj.io/secret-type: cluster
+  template:
+    metadata:
+      name: '{{.app}}-{{.nameNormalized}}'
+      annotations:
+        argocd.argoproj.io/sync-wave: '{{.syncWave}}'
+    spec:
+      project: default
+      sources:
+        - repoURL: '{{.chartRepo}}'
+          chart: '{{.chart}}'
+          targetRevision: '{{.chartVersion}}'
+          helm:
+            valueFiles:
+              - $vals/{{.valuesPath}}/values-{{.metadata.labels.cloud}}.yaml
+        - repoURL: https://github.com/klausanderson/devops-cv-project
+          targetRevision: main
+          ref: vals
+      destination:
+        name: '{{.name}}'
+        namespace: '{{.namespace}}'
+      syncPolicy:
+        automated: { prune: true, selfHeal: true }
+        syncOptions:
+          - CreateNamespace=true

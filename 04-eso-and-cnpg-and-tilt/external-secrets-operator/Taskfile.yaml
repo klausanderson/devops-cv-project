@@ -15,7 +15,6 @@ tasks:
         helm upgrade --install external-secrets \
           external-secrets/external-secrets \
           -n external-secrets \
-          --values values.yaml \
           --create-namespace
 
   02-create-iam-service-account:
@@ -36,6 +35,31 @@ tasks:
         gcloud iam service-accounts add-iam-policy-binding external-secrets@k8s-learning-gke.iam.gserviceaccount.com \
           --role roles/iam.workloadIdentityUser \
           --member "serviceAccount:k8s-learning-gke.svc.id.goog[external-secrets/external-secrets]"
+
+  02-create-iam-service-account-azure:
+    desc: "Create Azure managed identity and attach necessary permissions"
+    cmds:
+      - |
+        az identity create \
+          --name external-secrets \
+          --resource-group k8s-learning-rg
+      - cmd: gum style "Attach Key Vault Secrets User role to the managed identity"
+        silent: true
+      - |
+        az role assignment create \
+          --role "Key Vault Secrets User" \
+          --assignee "$(az identity show --name external-secrets --resource-group k8s-learning-rg --query principalId -o tsv)" \
+          --scope "$(az keyvault show --name k8s-learning-kv --query id -o tsv)"
+      - cmd: gum style "Create federated credential to allow kubernetes service account to use the managed identity via workload identity"
+        silent: true
+      - |
+        az identity federated-credential create \
+          --name external-secrets \
+          --identity-name external-secrets \
+          --resource-group k8s-learning-rg \
+          --issuer "$(az aks show --name k8s-learning-aks --resource-group k8s-learning-rg --query oidcIssuerProfile.issuerUrl -o tsv)" \
+          --subject "system:serviceaccount:external-secrets:external-secrets" \
+          --audience api://AzureADTokenExchange
 
   03-annotate-kubernetes-service-account:
     cmds:

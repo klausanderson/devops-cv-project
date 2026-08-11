@@ -72,7 +72,62 @@ tasks:
       - kubectl apply -f ScheduleBackup.yaml
       - kubectl apply -f Backup.yaml
 
-  07-delete-namespace:
+  07-create-azure-storage-account:
+    desc: "Create an Azure storage account and container for backups"
+    vars:
+      STORAGE_ACCOUNT: kuberneteskcnpgbackups
+      CONTAINER_NAME: cnpg-backups
+      RESOURCE_GROUP: k8s-learning-rg
+    cmds:
+      - |
+        az storage account create \
+          --name {{.STORAGE_ACCOUNT}} \
+          --resource-group {{.RESOURCE_GROUP}} \
+          --sku Standard_LRS
+      - |
+        az storage container create \
+          --name {{.CONTAINER_NAME}} \
+          --account-name {{.STORAGE_ACCOUNT}} \
+          --auth-mode login
+
+  08-create-iam-service-account-azure:
+    desc: "Create Azure managed identity and attach necessary permissions"
+    vars:
+      STORAGE_ACCOUNT: kuberneteskcnpgbackups
+      RESOURCE_GROUP: k8s-learning-rg
+    cmds:
+      - |
+        az identity create \
+          --name cnpg-backups \
+          --resource-group {{.RESOURCE_GROUP}}
+      - cmd: gum style "Attach Storage Blob Data Contributor role to the managed identity for the backup storage account"
+        silent: true
+      - |
+        az role assignment create \
+          --role "Storage Blob Data Contributor" \
+          --assignee "$(az identity show --name cnpg-backups --resource-group {{.RESOURCE_GROUP}} --query principalId -o tsv)" \
+          --scope "$(az storage account show --name {{.STORAGE_ACCOUNT}} --resource-group {{.RESOURCE_GROUP}} --query id -o tsv)"
+      - cmd: gum style "Create federated credential to allow kubernetes service account to use the managed identity via workload identity"
+        silent: true
+      - |
+        az identity federated-credential create \
+          --name cnpg-backups \
+          --identity-name cnpg-backups \
+          --resource-group {{.RESOURCE_GROUP}} \
+          --issuer "$(az aks show --name k8s-learning-aks --resource-group {{.RESOURCE_GROUP}} --query oidcIssuerProfile.issuerUrl -o tsv)" \
+          --subject "system:serviceaccount:${NAMESPACE}:cnpg-with-backup-config-azure" \
+          --audience api://AzureADTokenExchange
+
+  09-apply-cluster-with-backup-config-azure:
+    desc: "Apply cnpg cluster definition with backup configuration"
+    cmds:
+      - cmd: gum style "🚨 This assumes you have set up an Azure Storage container with workload identity providing access to the pod! 🚨 "
+        silent: true
+      - kubectl apply -f Cluster.cnpg-with-backup-config-azure.yaml
+      - kubectl apply -f ScheduleBackup.yaml
+      - kubectl apply -f Backup.yaml
+
+  10-delete-namespace:
     desc: "Delete the namespace to clean up"
     cmds:
       - cmd: gum style "🚨 Deleting the namespace recursively deletes the resources inside of it! 🚨 "

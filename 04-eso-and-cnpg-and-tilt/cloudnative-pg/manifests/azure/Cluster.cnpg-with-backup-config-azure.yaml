@@ -1,0 +1,20 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: cnpg-with-backup-config-azure
+spec:
+  instances: 2
+  storage:
+    size: 1Gi
+  backup:
+    barmanObjectStore:
+      destinationPath: "https://kuberneteskcnpgbackups.blob.core.windows.net/cnpg-backups"
+      azureCredentials:
+        inheritFromAzureAD: true
+    retentionPolicy: "30d"
+  serviceAccountTemplate:
+    metadata:
+      annotations:
+        azure.workload.identity/client-id: <AZURE_IDENTITY_CLIENT_ID>
+      labels:
+        azure.workload.identity/use: "true"

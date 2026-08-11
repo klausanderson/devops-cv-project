@@ -1,0 +1,5 @@
+# The external-secrets operator install itself doesn't differ by cloud - only the
+# ClusterSecretStore/ExternalSecret CRs it manages do (see manifests/gcp vs manifests/azure).
+# Kept as a separate per-cloud file only because cloud-specific-charts.yaml's multi-source
+# Application needs a values-{cloud}.yaml path to resolve for each fan-out target.
+{}

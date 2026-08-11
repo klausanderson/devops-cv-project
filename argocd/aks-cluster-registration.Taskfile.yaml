@@ -1,0 +1,74 @@
+version: "3"
+
+env:
+  BORDER: double
+  BORDER_FOREGROUND: "212"
+  PADDING: "1 1"
+  MARGIN: "1 1"
+  AKS_CONTEXT: aks-cluster
+  KUBECONFIG_PATH: ./aks-token-kubeconfig.yaml
+
+tasks:
+  01-create-argocd-manager-namespace:
+    desc: "Create the namespace for the ArgoCD manager service account on AKS"
+    cmds:
+      - kubectl --context ${AKS_CONTEXT} create namespace argocd-manager
+
+  02-create-argocd-manager-service-account:
+    desc: "Create the ArgoCD manager service account on AKS"
+    cmds:
+      - kubectl --context ${AKS_CONTEXT} create serviceaccount argocd-manager -n argocd-manager
+
+  03-bind-argocd-manager-cluster-admin:
+    desc: "Grant the ArgoCD manager service account cluster-admin via ClusterRoleBinding"
+    cmds:
+      - |
+        kubectl --context ${AKS_CONTEXT} create clusterrolebinding argocd-manager \
+          --clusterrole=cluster-admin --serviceaccount=argocd-manager:argocd-manager
+
+  04-create-argocd-manager-token-secret:
+    desc: "Create a long-lived token Secret for the service account (k8s 1.24+ no longer auto-generates one)"
+    cmds:
+      - cmd: gum style "k8s 1.24+ doesn't auto-generate SA token secrets - creating one explicitly"
+        silent: true
+      - kubectl --context ${AKS_CONTEXT} apply -f manifests/ArgocdManagerTokenSecret.yaml
+
+  05-build-token-kubeconfig:
+    desc: "Manual step: assemble a token-based kubeconfig (no exec/kubelogin block) from the SA token, CA cert, and AKS API server URL"
+    cmds:
+      - cmd: |
+          gum style "🚨 Manual step 🚨
+          Assemble ${KUBECONFIG_PATH} from:
+            - token:  kubectl --context ${AKS_CONTEXT} -n argocd-manager get secret argocd-manager-token -o jsonpath='{.data.token}' | base64 -d
+            - ca:     kubectl --context ${AKS_CONTEXT} -n argocd-manager get secret argocd-manager-token -o jsonpath='{.data.ca\.crt}' | base64 -d
+            - server: az aks show --name <aks-name> --resource-group <rg> --query fqdn -o tsv
+          Do NOT use 'az aks get-credentials' - it produces an exec-based (kubelogin) kubeconfig,
+          and the ArgoCD application-controller pod has no az/kubelogin installed, so sync would fail."
+        silent: true
+
+  06-register-aks-cluster:
+    desc: "Register the AKS cluster with ArgoCD using the token-based kubeconfig, labeled cloud=azure"
+    cmds:
+      - |
+        argocd cluster add aks-token-context \
+          --name aks-cluster \
+          --label cloud=azure \
+          --kubeconfig ${KUBECONFIG_PATH}
+
+  07-label-cluster-secret-fallback:
+    desc: "Fallback only if the ArgoCD CLI predates --label: find and label the generated cluster secret manually"
+    cmds:
+      - kubectl -n argocd get secrets -l argocd.argoproj.io/secret-type=cluster
+      - cmd: gum style "Find the cluster-<derived-name> secret above, then run"
+        silent: true
+      - cmds:
+          - |
+            kubectl -n argocd label secret cluster-<derived-name> cloud=azure"
+        
+
+  08-verify-cluster-registration:
+    desc: "Verify registered cluster secrets have the cloud label set"
+    cmds:
+      - |
+        kubectl -n argocd get secrets -l argocd.argoproj.io/secret-type=cluster \
+          -o custom-columns=NAME:.metadata.name,CLOUD:.metadata.labels.cloud

@@ -1,0 +1,67 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: shared-apps
+  namespace: argocd
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+    - matrix:
+        generators:
+          - list:
+              elements:
+                - app: api-golang
+                  path: 03-Project-manifests/api-golang
+                  namespace: api-golang
+                  syncWave: "5"
+                - app: api-node
+                  path: 03-Project-manifests/api-node
+                  namespace: api-node
+                  syncWave: "5"
+                - app: client-react
+                  path: 03-Project-manifests/client-react
+                  namespace: client-react
+                  syncWave: "5"
+                - app: middleware
+                  path: 03-Project-manifests/common/manifests
+                  namespace: traefik
+                  syncWave: "0"
+                - app: cert-manager-issuers
+                  path: 03-Project-manifests/cert-manager-issuers/manifests
+                  namespace: cert-manager
+                  syncWave: "1"
+                - app: grafana-dashboards
+                  path: 03-Project-manifests/grafana-dashboards
+                  namespace: monitoring
+                  syncWave: "4"
+                - app: load-generator-python
+                  path: 03-Project-manifests/load-generator-python
+                  namespace: load-generator
+                  syncWave: "6"
+                - app: cnpg-demo-app-access
+                  path: 04-eso-and-cnpg-and-tilt/cnpg-demo-app-access/manifests
+                  namespace: demo-app
+                  syncWave: "3"
+          - clusters:
+              selector:
+                matchLabels:
+                  argocd.argoproj.io/secret-type: cluster
+  template:
+    metadata:
+      name: '{{.app}}-{{.nameNormalized}}'
+      annotations:
+        argocd.argoproj.io/sync-wave: '{{.syncWave}}'
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/klausanderson/devops-cv-project
+        targetRevision: main
+        path: '{{.path}}'
+      destination:
+        name: '{{.name}}'
+        namespace: '{{.namespace}}'
+      syncPolicy:
+        automated: { prune: true, selfHeal: true }
+        syncOptions:
+          - CreateNamespace=true
