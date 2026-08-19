@@ -60,7 +60,12 @@ tasks:
           --issuer "$(az aks show --name k8s-learning-aks --resource-group k8s-learning-rg --query oidcIssuerProfile.issuerUrl -o tsv)" \
           --subject "system:serviceaccount:external-secrets:external-secrets" \
           --audience api://AzureADTokenExchange
-
+      - cmd: gum style "Get the managed identity id/client id  "
+      - |
+        az identity show \
+          --name external-secrets \
+          --resource-group k8s-learning-rg \
+          --query clientId -o tsv
   03-annotate-kubernetes-service-account:
     cmds:
       - cmd: gum style "Annotate k8s service account to allow it to use IAM serivce account via workload identity"

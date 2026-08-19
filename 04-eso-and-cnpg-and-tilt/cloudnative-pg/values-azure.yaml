@@ -1,0 +1,62 @@
+# Values for the `cnpg/cluster` chart (https://cloudnative-pg.github.io/charts) on AKS.
+#
+# The chart renders the Cluster and the ScheduledBackup, so the per-cloud split lives here
+# in values instead of in hand-written manifests: both clouds deploy the *same* resources,
+# only the `backups` provider block and the Workload Identity annotation differ.
+#
+# Deployed by argocd/applicationsets/cloud-specific-charts.yaml into namespace `db`.
+
+# -- Same Cluster name in both clouds, so anything referring to the cluster (its generated
+# `<name>-app` secret, the RBAC in 04-eso-and-cnpg-and-tilt/cnpg-demo-app-access) stays cloud-agnostic.
+fullnameOverride: cnpg-with-backup-config
+
+type: postgresql
+mode: standalone
+version:
+  # Pinned explicitly rather than left to the operator default. Must match the major version
+  # already running - CloudNativePG cannot do an in-place major upgrade.
+  postgresql: "17"
+
+cluster:
+  instances: 2
+  storage:
+    size: 1Gi
+  # The operator names the generated ServiceAccount after the cluster, so the federated
+  # credential subject is system:serviceaccount:db:cnpg-with-backup-config.
+  serviceAccountTemplate:
+    metadata:
+      annotations:
+        azure.workload.identity/client-id: <AZURE_IDENTITY_CLIENT_ID>
+      labels:
+        azure.workload.identity/use: "true"
+
+backups:
+  enabled: true
+  # In-tree barman object store, matching the previous manifests. CloudNativePG 1.26+ also
+  # offers `method: plugin` with the barman-cloud plugin, which needs the plugin installed first.
+  method: barmanObjectStore
+  provider: azure
+  azure:
+    storageAccount: kuberneteskcnpgbackups
+    containerName: cnpg-backups
+    serviceName: blob
+    path: ""                 # the chart default "/" would leave a trailing slash in destinationPath
+    inheritFromAzureAD: true  # credentials come from Workload Identity, not a storage key
+  secret:
+    create: false             # nothing to store: inheritFromAzureAD covers authentication
+  wal:
+    compression: gzip
+    encryption: ""            # the chart default AES256 is an S3 server-side-encryption header
+    maxParallel: 1
+  data:
+    compression: gzip
+    encryption: ""
+    jobs: 2
+  retentionPolicy: "30d"
+  # The chart sets `immediate: true` on scheduled backups, which covers what the one-off
+  # Backup/now-0 manifest used to do on first sync.
+  scheduledBackups:
+    - name: daily
+      schedule: "0 0 0 * * *"
+      backupOwnerReference: self
+      method: barmanObjectStore

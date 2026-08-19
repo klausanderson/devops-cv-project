@@ -11,10 +11,6 @@ spec:
         generators:
           - list:
               elements:
-                - app: cnpg
-                  basePath: 04-eso-and-cnpg-and-tilt/cloudnative-pg/manifests
-                  namespace: cnpg-system
-                  syncWave: "2"
                 - app: eso-config
                   basePath: 04-eso-and-cnpg-and-tilt/external-secrets-operator/manifests
                   namespace: external-secrets

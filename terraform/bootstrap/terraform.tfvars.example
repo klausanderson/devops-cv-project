@@ -1,3 +1,9 @@
 gcp_project_id       = "k8s-learning-gke"
 gcp_region           = "europe-central2"
 tf_state_bucket_name = "klaus-devops-journey-tfstate"
+
+azure_subscription_id               = "00000000-0000-0000-0000-000000000000"
+azure_location                       = "polandcentral"
+azure_tf_state_resource_group_name  = "azure-devops-learning-tfstate"
+azure_tf_state_storage_account_name = "klausdevopstfstate"
+azure_tf_state_container_name       = "tfstate"

@@ -18,6 +18,13 @@ spec:
                   valuesPath: 04-eso-and-cnpg-and-tilt/external-secrets-operator
                   namespace: external-secrets
                   syncWave: "1"
+                - app: cnpg
+                  chart: cluster
+                  chartRepo: https://cloudnative-pg.github.io/charts
+                  chartVersion: 0.8.1
+                  valuesPath: 04-eso-and-cnpg-and-tilt/cloudnative-pg
+                  namespace: db
+                  syncWave: "2"
                 - app: kube-prometheus-stack
                   chart: kube-prometheus-stack
                   chartRepo: https://prometheus-community.github.io/helm-charts
